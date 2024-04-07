@@ -39,6 +39,7 @@ np.random.seed(666)
 directory = os.getcwd()
 data_path = os.path.join(directory, "data/fashion_mnist_data.txt")
 labels_path = os.path.join(directory, "data/fashion_mnist_labels.txt")
+output_path = os.path.join(directory, "output_gorkem/")
 
 # Figure size configuration
 # NOTE: This is a global configuration for all figures, you may need to adjust this
@@ -142,7 +143,8 @@ plt.scatter(X_train_pca[:, 0], X_train_pca[:, 1])
 plt.xlabel("Principal Component 1")
 plt.ylabel("Principal Component 2")
 plt.title("PCA Plot")
-plt.savefig("PCA_plot.png")
+plt.savefig(output_path + "PCA_plot.png")
+
 
 # %% [markdown]
 # Plotting the eigenvalues in descending order
@@ -155,7 +157,8 @@ plt.plot(sorted_eigenvalues)
 plt.xlabel("Number of components")
 plt.ylabel("Eigenvalues")
 plt.title("Eigenvalues in decreasing order")
-plt.savefig("Eigenvalues_plot.png")
+plt.savefig(output_path + "Eigenvalues_plot.png")
+
 
 # %% [markdown]
 # Plotting percentages of cumulative variance
@@ -175,7 +178,8 @@ plt.ylabel("Percentage of variance")
 plt.title("Cumulative variance")
 plt.axhline(y=threshold, color="r", linestyle="--")
 plt.axvline(x=154, color="g", linestyle="--")
-plt.savefig("Cumulative_variance.png")
+plt.savefig(output_path + "Cumulative_variance_plot.png")
+
 
 # %% [markdown]
 # To get 95%, we roughly need 154 PCs.
@@ -194,14 +198,16 @@ plt.figure()
 plt.axis("off")
 plt.title("Mean image")
 plt.imshow(mean_image)
-plt.savefig("Mean_image.png")
+plt.savefig(output_path + "Mean_image.png")
+
 
 # Grayscale
 plt.figure()
 plt.axis("off")
 plt.title("Mean image (grayscale)")
 plt.imshow(mean_image, cmap="gray")
-plt.savefig("Mean_image_grayscale.png")
+plt.savefig(output_path + "Mean_image_grayscale.png")
+
 
 # %% [markdown]
 # Displaying eigenvectors
@@ -218,7 +224,8 @@ for i in range(12 * 12):
     plt.imshow(eigenvector)
 
 plt.suptitle("First 144 principal components")
-plt.savefig("First_144_principal_components.png")
+plt.savefig(output_path + "First_144_principal_components.png")
+
 
 # %% [markdown]
 # For a clearer view of the initial PCs, I'm also displaying the first 36.
@@ -233,7 +240,8 @@ for i in range(6 * 6):
     plt.imshow(eigenvector)
 
 plt.suptitle("First 36 principal components")
-plt.savefig("First_36_principal_components.png")
+plt.savefig(output_path + "First_36_principal_components.png")
+
 
 # %% [markdown]
 # ### 1.4 Training a Gaussian Classifier
@@ -307,7 +315,8 @@ def plot_errors(
     plt.ylabel(ylabel)
     plt.title(title + " (Train)")
     plt.xticks(dimensions, rotation=90)
-    plt.savefig(title + "_train.png")
+    plt.savefig(output_path + title + "_train.png")
+    
 
     # Testing percentage errors
     plt.figure()
@@ -316,7 +325,8 @@ def plot_errors(
     plt.ylabel(ylabel)
     plt.title(title + " (Test)")
     plt.xticks(dimensions, rotation=90)
-    plt.savefig(title + "_test.png")
+    plt.savefig(output_path + title + "_test.png")
+    
 
 
 plot_errors(
@@ -468,11 +478,9 @@ def isomap_classification(n_neighbors, dimensions):
     for dim in dimensions:
         # Apply Isomap to the training and testing data using scikit-learn
         # The number of neighbors is set to n_neighbors
-        print("Creating Isomap with ", dim, " dimensions")
         isomap = Isomap(n_components=dim, n_neighbors=n_neighbors)
         print("Fitting Isomap with ", dim, " dimensions")
         isomap.fit(centered_data)
-        print("Transforming data")
         # isomap.fit(centered_X_train) # If you want to use only the training data
         X_train_isomap = isomap.transform(centered_X_train)
         X_test_isomap = isomap.transform(centered_X_test)
@@ -520,7 +528,7 @@ errors_train_gnb, errors_test_gnb, errors_train_qda, errors_test_qda = (
 plot_errors(
     errors_train_gnb,
     errors_test_gnb,
-    "Classification Error Percentage vs Number of Isomap Components (GNB)",
+    "Classification Error Percentage vs Number of Isomap Dimensions (5 Neighbors) (GNB)",
     "Number of Dimensions",
     "Gaussian Classification Error Percentage",
     isomap_dimensions,
@@ -529,7 +537,7 @@ plot_errors(
 plot_errors(
     errors_train_qda,
     errors_test_qda,
-    "Classification Error Percentage vs Number of Isomap Components (QDA)",
+    "Classification Error Percentage vs Number of Isomap Dimensions (5 Neighbors) (QDA)",
     "Number of Dimensions",
     "Quadratic Discriminant Analysis Classification Error Percentage",
     isomap_dimensions,
@@ -547,7 +555,7 @@ errors_train_gnb, errors_test_gnb, errors_train_qda, errors_test_qda = (
 plot_errors(
     errors_train_gnb,
     errors_test_gnb,
-    "Classification Error Percentage vs Number of Isomap Components (GNB)",
+    "Classification Error Percentage vs Number of Isomap Dimensions (20 Neighbors) (GNB)",
     "Number of Dimensions",
     "Gaussian Classification Error Percentage",
     isomap_dimensions,
@@ -556,7 +564,7 @@ plot_errors(
 plot_errors(
     errors_train_qda,
     errors_test_qda,
-    "Classification Error Percentage vs Number of Isomap Components (QDA)",
+    "Classification Error Percentage vs Number of Isomap Dimensions (20 Neighbors) (QDA)",
     "Number of Dimensions",
     "Quadratic Discriminant Analysis Classification Error Percentage",
     isomap_dimensions,
@@ -643,16 +651,18 @@ def plot_t_SNE(initialization, iterations, n_iter_without_progress, perplexity):
         + str(n_iter_without_progress)
     )
     plt.savefig(
-        "t-SNE Plot, perplexity = "
+        output_path
+        + "t-SNE_plot_perplexity_"
         + str(perplexity)
-        + ", initialization = "
+        + "_init_"
         + initialization
-        + ", iterations = "
+        + "_iter_"
         + str(iterations)
-        + ", n_iter_without_progress = "
+        + "_n_iter_"
         + str(n_iter_without_progress)
         + ".png"
     )
+    
 
 
 # %% [markdown]
